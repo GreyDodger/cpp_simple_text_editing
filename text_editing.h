@@ -112,14 +112,10 @@ struct te_state
 	{
 		memset( file_name, 0, 256 );
 	}
-
-	~te_state()
-	{
-		free( text_mem );
-	}
 };
 
-namespace _internal
+
+namespace _internal // {{{
 {
 
 #define LOOP(count, var_name) for(int var_name = 0; var_name < count; var_name++ )
@@ -806,20 +802,21 @@ void compress_mem( te_state * te )
 	}
 }
 
-} // namespace _internal
+} // namespace _internal }}} 
 
-
-// Public Functions
-// ----------------
+// Public Functions {{{
+// --------------------
 
 
 // start editing a new file with name
 void enew( te_state * te, char * file_name = nullptr );
 // edit existing file
 void edit( te_state * te, char * file_name );
-// IMPLEMENT: void save( te_state * te );
-// IMPLEMENT: void quit( te_state * te );
+
+void save( te_state * te );
+void quit( te_state * te );
 void save_and_quit( te_state * te );
+
 void insert( te_state * te, char * text );
 // IMPLEMENT: void insert_on_new_line_above( te_state * te, char * text );
 // IMPLEMENT: void insert_on_new_line_below( te_state * te, char * text );
@@ -863,9 +860,10 @@ void search_backward( te_state * te, char * text,
 void delete_line( te_state * te );
 
 
+// }}}
 
-// Implementations
-// ---------------
+// Implementations {{{
+// -------------------
 
 
 void enew( te_state * te, char * file_name )
@@ -935,8 +933,7 @@ void edit( te_state * te, char * file_name )
 	strcpy( te->file_name, file_name );
 }
 
-
-void save_and_quit( te_state * te )
+void save( te_state * te )
 {
 	using namespace _internal;
 
@@ -950,10 +947,25 @@ void save_and_quit( te_state * te )
 	fwrite( te->text_chunks, sizeof( char ), len, file );
 	fwrite( "\n", sizeof( char ), 1, file );
 	fclose( file );
+}
 
+void quit( te_state * te )
+{
 	free( te->text_mem );
 	memset( te, 0, sizeof( te_state ) );
+
+	te->num_text_chunks = 0;
+	te->num_active_chunks = 0;
+
+	te->cursor_position = 0;
 }
+
+void save_and_quit( te_state * te )
+{
+	save( te );
+	quit( te );
+}
+
 
 
 
@@ -1226,4 +1238,6 @@ void delete_line( te_state * te )
 #undef CHK_DATA
 #undef CHK_MEM
 
-}
+// }}}
+
+} // namespace text_editing
