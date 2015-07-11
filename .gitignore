@@ -29,5 +29,12 @@
 
 
 # Other Stuff
+*.pdb
+*.map
+*.sln
+*.suo
+
+
+*.txt
 *.fs
 *.vssettings
